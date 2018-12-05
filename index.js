@@ -1,3 +1,4 @@
+var multiparty = require('multiparty');
 const http = require('http')
 const forward = require('http-forward')
 
@@ -10,16 +11,15 @@ var server = http.createServer(function (req, res) {
   // req.forward = { target: 'http://new.server.net' }
   // forward(req, res)
 
+  var form = new multiparty.Form();
 
-  let body = '';
-  req.on('data', chunk => {
-      body += chunk.toString(); // convert Buffer to string
-  });
-  req.on('end', () => {
-      console.log(body);
-      res.end('ah ah ah')
+  form.parse(req, function(err, fields, files) {
+    console.log('fields', fields)
+    console.log('files', files)
   });
 
+
+  res.end('ah ah ah')
 
 })
 
