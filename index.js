@@ -10,7 +10,17 @@ var server = http.createServer(function (req, res) {
   // req.forward = { target: 'http://new.server.net' }
   // forward(req, res)
 
-  res.end('ah ah ah')
+
+  let body = '';
+  req.on('data', chunk => {
+      body += chunk.toString(); // convert Buffer to string
+  });
+  req.on('end', () => {
+      console.log(body);
+      res.end('ah ah ah')
+  });
+
+
 })
 
 server.listen(7001)
