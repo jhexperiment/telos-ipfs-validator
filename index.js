@@ -1,6 +1,10 @@
 var multiparty = require('multiparty');
 const http = require('http')
 const forward = require('http-forward')
+var ipfsClient = require('ipfs-http-client')
+
+var ipfs = ipfsClient('localhost', '5001', { protocol: 'http' })
+
 
 var server = http.createServer(function (req, res) {
   console.log('req.url', req.url)
@@ -12,7 +16,7 @@ var server = http.createServer(function (req, res) {
 
 
 
-  
+
   var form = new multiparty.Form();
 
 
@@ -20,7 +24,15 @@ var server = http.createServer(function (req, res) {
   form.parse(req, function(err, fields, files) {
     console.log('fields', fields)
     console.log('files', files)
-  });
+    for (file in files) {
+      console.log('file', file)
+    }
+    if ( files.length ) {
+
+      ipfs.addFromFs(files[0].path, {onlyHash: true}, (err, result) => {
+        if (err) { throw err }
+
+      });
 
 
 
