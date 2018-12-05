@@ -3,7 +3,7 @@ const http = require('http')
 const forward = require('http-forward')
 var ipfsClient = require('ipfs-http-client')
 
-var ipfs = ipfsClient('localhost', '5001', { protocol: 'http' })
+var ipfs = ipfsClient('localhost', '6001', { protocol: 'http' })
 
 
 var server = http.createServer(function (req, res) {
@@ -24,17 +24,18 @@ var server = http.createServer(function (req, res) {
   form.parse(req, function(err, fields, files) {
     console.log('fields', fields)
     console.log('files', files)
-    for (file in files) {
-      console.log('file', file)
-    }
-    if ( files.length ) {
-
-      ipfs.addFromFs(files[0].path, {onlyHash: true}, (err, result) => {
+//    console.log('blah', files.file[0].path)
+   
+    
+    if ( files.file && files.file && files.file[0] && files.file[0].path ) {
+      let path = files.file[0].path
+      ipfs.addFromFs(path, {onlyHash: false}, (err, result) => {
         if (err) { throw err }
-
+        console.log(result)
       });
 
-
+    }
+  })
 
 
 })
