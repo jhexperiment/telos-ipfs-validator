@@ -2,6 +2,7 @@ const multiparty = require('multiparty');
 const http = require('http')
 const ipfsClient = require('ipfs-http-client')
 const EosApi = require('eosjs-api')
+const config = require('config.json')
 
 const ipfs = ipfsClient('localhost', '6001', { protocol: 'http' })
 
@@ -24,8 +25,23 @@ const server = http.createServer(function (req, res) {
 
   form.parse(req, function(err, fields, files) {
 
+    let scope = null;
+    if (
+      fields.scope
+      && fields.scope.length
+      && ( fields.scope[0] !== "" )
+    ) {
+      scope = fields.scope[0];
+    }
+
+    if ( ! scope ) {
+      res.writeHead(501, {'Content-type':'text/plain'});
+      res.write('Missing scope.')
+      res.end();
+    }
+
     if ( files && files.file && files.file[0] && files.file[0].path ) {
-	console.log(files.file[0])
+      console.log(files.file[0])
       let path = files.file[0].path
 
       ipfs.addFromFs(path, {onlyHash: true}, (err, result) => {
@@ -37,7 +53,7 @@ const server = http.createServer(function (req, res) {
 
         eos.getTableRows({
           "json": true,
-          "scope": 'testipfs1111',
+          "scope": scope,
           "code": 'ipfspay11111',
           "table": "storage"
         })
@@ -77,11 +93,11 @@ const server = http.createServer(function (req, res) {
         })
       });
     }
-	  else {
-		  res.writeHead(404, {'Content-type':'text/plain'});
-		  res.write('Missing file.')
-		  res.end();
-	  }
+    else {
+      res.writeHead(404, {'Content-type':'text/plain'});
+      res.write('Missing file.')
+      res.end();
+    }
   })
 
 
