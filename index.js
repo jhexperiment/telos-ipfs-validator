@@ -7,7 +7,7 @@ console.log(config)
 const ipfs = ipfsClient(config.ipfs.address, config.ipfs.port, { protocol: config.ipfs.protocol })
 
 const options = {
-	httpEndpoint: [config.nodeos.protocol, '://', config.nodeos.address, ':', config.nodeos.port].join(''), 
+  httpEndpoint: [config.nodeos.protocol, '://', config.nodeos.address, ':', config.nodeos.port].join(''),
   verbose: false, // API logging
   logger: { // Default logging functions
     log: console.log,
@@ -41,7 +41,7 @@ const server = http.createServer(function (req, res) {
       return
     }
 
-	  console.log('scope: ', scope)
+    console.log('scope: ', scope)
 
     if ( files && files.file && files.file[0] && files.file[0].path ) {
       console.log(files.file[0])
@@ -81,14 +81,14 @@ const server = http.createServer(function (req, res) {
               res.writeHead(200, {'Content-type':'application/json'});
               res.write(JSON.stringify(result));
               res.end( );
-	      return
+              return
             })
           }
           else {
             res.writeHead(403, {'Content-type':'text/plain'});
             res.write('You need to buy space first.');
             res.end( );
-	    return
+            return
           }
 
         })
