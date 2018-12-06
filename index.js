@@ -58,16 +58,16 @@ const server = http.createServer(function (req, res) {
             ipfs.addFromFs(path, {onlyHash: false}, (err, result) => {
               if (err) { throw err }
               console.log(result)
-              
-              respone.writeHead(200, {'Content-type':'application/json'});
-              response.write(result);
-              response.end( );
+
+              res.writeHead(200, {'Content-type':'application/json'});
+              res.write(JSON.stringify(result));
+              res.end( );
             })
           }
           else {
-            respone.writeHead(403, {'Content-type':'text/plan'});
-            response.write('You need to buy space first.');
-            response.end( );
+            res.writeHead(403, {'Content-type':'text/plan'});
+            res.write('You need to buy space first.');
+            res.end( );
 
           }
 
