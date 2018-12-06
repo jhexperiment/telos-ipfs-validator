@@ -10,7 +10,7 @@
     "protocol": "http"
   },
   "ipfs.pay": {
-    "code": "ipfspay1111",
+    "code": "ipfspay11111",
     "table": "storage"
   }
 }
