@@ -25,14 +25,14 @@ const server = http.createServer(function (req, res) {
   form.parse(req, function(err, fields, files) {
 
     if ( files && files.file && files.file[0] && files.file[0].path ) {
-
+	console.log(files.file[0])
       let path = files.file[0].path
 
       ipfs.addFromFs(path, {onlyHash: true}, (err, result) => {
 
         if (err) { throw err }
 
-        console.log(result[0].hash)
+        console.log(result[0])
         let requestingHash = result[0].hash;
 
         eos.getTableRows({
@@ -65,7 +65,7 @@ const server = http.createServer(function (req, res) {
             })
           }
           else {
-            res.writeHead(403, {'Content-type':'text/plan'});
+            res.writeHead(403, {'Content-type':'text/plain'});
             res.write('You need to buy space first.');
             res.end( );
 
@@ -77,6 +77,11 @@ const server = http.createServer(function (req, res) {
         })
       });
     }
+	  else {
+		  res.writeHead(404, {'Content-type':'text/plain'});
+		  res.write('Missing file.')
+		  res.end();
+	  }
   })
 
 
