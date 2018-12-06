@@ -61,6 +61,9 @@ const server = http.createServer(function (req, res) {
               res.send(result)
             })
           }
+          else {
+            res.status(403).send('You need to buy space first.')
+          }
 
         })
         .catch((error) => {
