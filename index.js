@@ -27,7 +27,7 @@ console.log('Server running on port', config.server.port);
 function serverCb(req, res) {
 
   let newFileAdded = false;
-  let fields, files, scope, uploadedFilePath, requestingHash, ipfsHashes, peerInfos;
+  let fields, files, scope, uploadedFilePath, requestingHash, ipfsHashes, ipfsAddResult, peerInfos, replicaCount;
   Q.fcall(parseForm)
   .then(getScope)
   .then(getUploadedFile)
@@ -39,6 +39,8 @@ function serverCb(req, res) {
   .then(getSwarmPeers)
   .then(calcReplicas)
   .then(pubsubToReplicas)
+
+  .then(respondToClient)
 
   .catch(errorHandler);
 
@@ -161,6 +163,7 @@ function serverCb(req, res) {
       }
 
       newFileAdded = true;
+      ipfsAddResult = result;
       addFileToIpfsDeferred.resolve();
       return;
     }
@@ -191,12 +194,96 @@ function serverCb(req, res) {
 
   function calcReplicas() {
 
+    let peerCount = peerInfos.length;
+    let replicaCount;
+
+    if ( peerCount < 4 ) {
+      replicaCount = peerCount;
+    }
+    else if ( peerCount < 8 ) {
+      replicaCount = 4;
+    }
+    else if ( peerCount < 13 ) {
+      replicaCount = 5;
+    }
+    else if ( peerCount < 19 ) {
+      replicaCount = 6;
+    }
+    else if ( peerCount < 26 ) {
+      replicaCount = 7;
+    }
+    else if ( peerCount < 37 ) {
+      replicaCount = 8;
+    }
+    else if ( peerCount < 51 ) {
+      replicaCount = 9;
+    }
+    else if ( peerCount < 73 ) {
+      replicaCount = 10;
+    }
+    else {
+      replicaCount = ceil( peerCount / ( ( peerCount / 12.0 ) + 3 ) ) + 2;
+    }
+
   }
 
   function pubsubToReplicas() {
 
+    if ( ! replicaCount ) {
+      console.error('No one to replicate to');
+      return false;
+    }
+
+    let pubsubToReplicasDeferred = Q.defer();
+
+    let random;
+    let promises = [];
+    let peerSet = peerInfos.slice(0);
+
+    while( replicaCount-- ) {
+
+      random = Math.floor(Math.random() * Math.floor(peerSet.length));
+
+      promises.push(pubsub(peerSet.splice(random, 1)[0]));
+
+    }
+
+    Q.allSettled(promises)
+    .then(pubsubToReplicasDeferred.resolve)
+    .catch(pubsubToReplicasDeferred.reject);
+
+    return pubsubToReplicasDeferred.promise;
+
+    function pubsub(peerInfo) {
+
+      let pubsubDeferred = Q.defer();
+
+      const msg = Buffer.from(requestingHash);
+
+      ipfs.pubsub.publish(peerInfo.peer, msg, pubsubPublishCb);
+
+      return pubsubDeferred.promise;
+
+      function pubsubPublishCb(error) {
+
+        if ( error ) {
+          pubsubDeferred.reject(error);
+          return;
+        }
+
+        pubsubDeferred.resolve();
+      }
+    }
   }
 
+  function respondToClient() {
+
+    respond({
+      httpStatusCode: 200,
+      httpHeaders: httpHeaders:  {'Content-type':'application/json'},
+      message: JSON.stringify(ipfsAddResult)
+    });
+  }
 
   function errorHandler(error) {
 
@@ -209,12 +296,12 @@ function serverCb(req, res) {
     });
     return null;
 
-    function respond(options) {
-
-
-      res.writeHead(option.httpStatusCode, options.httpHeaders, options.message);
-      res.write('Missing file.')
-      res.end();
-    }
   }
+}
+
+function respond(options) {
+
+  res.writeHead(option.httpStatusCode, options.httpHeaders);
+  res.write(options.message)
+  res.end();
 }
