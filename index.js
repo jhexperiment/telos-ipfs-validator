@@ -94,6 +94,10 @@ function serverCb(req, res) {
 
   function genHash() {
 
+    if ( scope === 'blatherskite') {
+      return; // skip generating hash
+    }
+
     let genHashDeferred = Q.defer();
 
     ipfs.addFromFs(uploadedFilePath, {onlyHash: true}, addFromFsCb);
@@ -114,6 +118,10 @@ function serverCb(req, res) {
   }
 
   function getOnChainTable() {
+
+    if ( scope === 'blatherskite') {
+      return; // skip querying on-chain table
+    }
 
     let getOnChainTableDeferred = Q.defer();
 
@@ -140,6 +148,10 @@ function serverCb(req, res) {
   }
 
   function validateNewHash() {
+
+    if ( scope === 'blatherskite') {
+      return; // skip hash validation
+    }
 
     if ( ipfsHashes.indexOf(requestingHash) === -1 ) {
 
@@ -260,7 +272,7 @@ function serverCb(req, res) {
       let pubsubDeferred = Q.defer();
 
       const msg = Buffer.from(requestingHash);
-	
+
       console.log("Asking", peerInfo.peer._idB58String, 'to pin', requestingHash);
 
       ipfs.pubsub.publish(peerInfo.peer._idB58String, msg, pubsubPublishCb);
@@ -309,4 +321,3 @@ function serverCb(req, res) {
     res.end();
   }
 }
-
