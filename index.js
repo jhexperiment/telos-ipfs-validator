@@ -17,13 +17,14 @@ const options = {
   fetchConfiguration: {}
 };
 
-
 const eos = EosApi(options);
 const server = http.createServer(serverCb);
 server.listen(config.server.port);
 
+console.log('Server running on port', config.server.port);
 
-function serverCb(req, res) => {
+
+function serverCb(req, res) {
 
   let newFileAdded = false;
   let fields, files, scope, uploadedFilePath, requestingHash, ipfsHashes, peerInfos;
@@ -92,7 +93,7 @@ function serverCb(req, res) => {
 
     let genHashDeferred = Q.defer();
 
-    ipfs.addFromFs(path, {onlyHash: true}, addFromFsCb);
+    ipfs.addFromFs(uploadedFilePath, {onlyHash: true}, addFromFsCb);
 
     return genHashDeferred.promise;
 
