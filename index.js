@@ -10,10 +10,10 @@ const ipfs = ipfsClient(config.ipfs.address, config.ipfs.port, { protocol: confi
 const options = {
   httpEndpoint: [config.nodeos.protocol, '://', config.nodeos.address, ':', config.nodeos.port].join(''),
   verbose: false, // API logging
-  logger: { // Default logging functions
-    log: console.log,
-    error: console.error
-  },
+  //logger: { // Default logging functions
+  //  log: console.log,
+  //  error: console.error
+  //},
   fetchConfiguration: {}
 };
 
@@ -25,6 +25,7 @@ console.log('Server running on port', config.server.port);
 
 
 function serverCb(req, res) {
+  console.log("Add requested.")
 
   let newFileAdded = false;
   let fields, files, scope, uploadedFilePath, requestingHash, ipfsHashes, ipfsAddResult, peerInfos, replicaCount;
@@ -162,6 +163,8 @@ function serverCb(req, res) {
         return;
       }
 
+      console.log("File added to IPFS.")
+
       newFileAdded = true;
       ipfsAddResult = result;
       addFileToIpfsDeferred.resolve();
@@ -185,7 +188,6 @@ function serverCb(req, res) {
       }
 
       peerInfos = _peerInfos;
-      console.log('peerInfos', peerInfos)
 
       getSwarmPeers.resolve();
     }
@@ -195,7 +197,6 @@ function serverCb(req, res) {
   function calcReplicas() {
 
     let peerCount = peerInfos.length;
-    let replicaCount;
 
     if ( peerCount < 4 ) {
       replicaCount = peerCount;
@@ -259,8 +260,10 @@ function serverCb(req, res) {
       let pubsubDeferred = Q.defer();
 
       const msg = Buffer.from(requestingHash);
+	
+      console.log("Asking", peerInfo.peer._idB58String, 'to pin', requestingHash);
 
-      ipfs.pubsub.publish(peerInfo.peer, msg, pubsubPublishCb);
+      ipfs.pubsub.publish(peerInfo.peer._idB58String, msg, pubsubPublishCb);
 
       return pubsubDeferred.promise;
 
@@ -277,10 +280,11 @@ function serverCb(req, res) {
   }
 
   function respondToClient() {
+    console.log("Completed file addition and replicas notified.")
 
     respond({
       httpStatusCode: 200,
-      httpHeaders: httpHeaders:  {'Content-type':'application/json'},
+      httpHeaders: {'Content-type':'application/json'},
       message: JSON.stringify(ipfsAddResult)
     });
   }
@@ -297,11 +301,12 @@ function serverCb(req, res) {
     return null;
 
   }
+
+  function respond(options) {
+
+    res.writeHead(options.httpStatusCode, options.httpHeaders);
+    res.write(options.message)
+    res.end();
+  }
 }
 
-function respond(options) {
-
-  res.writeHead(option.httpStatusCode, options.httpHeaders);
-  res.write(options.message)
-  res.end();
-}
