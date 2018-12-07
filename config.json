@@ -1,4 +1,7 @@
 {
+  "server": {
+    "port": 7001
+  },
   "ipfs": {
     "address": "localhost",
     "port": 6001,
