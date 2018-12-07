@@ -1,1 +1,1 @@
-# telos-ipfs-validater
+# telos-ipfs-validator
