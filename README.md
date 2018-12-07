@@ -50,3 +50,9 @@ npm install
 ```
 tail -f validator.log
 ```
+
+
+#### Deploy a ipfs.pay contract
+```
+teclos set contract ipfspay11111 ../telos/contracts/ipfs.pay ipfspay.wasm ipfspay.abi -p ipfspay11111
+```
