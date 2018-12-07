@@ -1,5 +1,5 @@
 {
-  "name": "telos-ipfs-validater",
+  "name": "telos-ipfs-validator",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jhexperiment/telos-ipfs-validater.git"
+    "url": "git+https://github.com/jhexperiment/telos-ipfs-validator.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jhexperiment/telos-ipfs-validater/issues"
+    "url": "https://github.com/jhexperiment/telos-ipfs-validator/issues"
   },
-  "homepage": "https://github.com/jhexperiment/telos-ipfs-validater#readme",
+  "homepage": "https://github.com/jhexperiment/telos-ipfs-validator#readme",
   "dependencies": {
     "eosjs-api": "^7.0.4",
     "http-forward": "^0.1.3",
